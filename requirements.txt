@@ -4,4 +4,3 @@ gunicorn
 pillow
 numpy
 tqdm
-random
