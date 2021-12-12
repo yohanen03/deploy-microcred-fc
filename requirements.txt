@@ -3,3 +3,6 @@ tensorflow-cpu
 gunicorn
 pillow
 numpy
+tqdm
+tensorflow.keras.utils -to_categorical
+random
