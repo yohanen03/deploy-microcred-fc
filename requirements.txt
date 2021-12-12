@@ -4,5 +4,4 @@ gunicorn
 pillow
 numpy
 tqdm
-tensorflow.keras.utils
 random
