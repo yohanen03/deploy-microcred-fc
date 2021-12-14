@@ -94,9 +94,21 @@
                         class="p-4 bg-green-500	 text-white rounded-md"
                     >
                         Prediksi Gambar
+                        
                     </button>
                 </form>
             </main>
         </section>
     </body>
+<configuration>
+    <system.webServer>
+        <httpErrors errorMode="Detailed" />
+        <asp scriptErrorSentToBrowser="true"/>
+        <validation validateIntegratedModeConfiguration="false" />
+    </system.webServer>
+    <system.web>
+        <customErrors mode="Off"/>
+        <compilation debug="true"/>
+    </system.web>
+</configuration>
 </html>
