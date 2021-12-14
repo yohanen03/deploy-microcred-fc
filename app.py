@@ -1,38 +1,64 @@
-from flask import Flask, render_template, request, send_from_directory
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.image import img_to_array, load_img
-from tensorflow import expand_dims
-import numpy as np
 import os
+from uuid import uuid4
+
+from flask import Flask, request, render_template, send_from_directory
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = './static/uploads/'
-model = load_model('model.h5')
+# app = Flask(__name__, static_folder="images")
 
-class_dict = {0:'freshapple',1:'freshbanana',2:'freshguava',3:'rottenapple',4:'rottenbanana',5:'rottenguava'}
 
-def predict_label(img_path):
-    loaded_img = load_img(img_path, target_size=(256, 256))
-    img_array = img_to_array(loaded_img) / 255.0
-    img_array = expand_dims(img_array, 0)
-    predicted_bit = np.round(model.predict(img_array)[0][0]).astype('int')
-    return class_dict[predicted_bit]
 
-@app.route('/', methods=['GET', 'POST'])
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+classes = ['Fresh Apple','Fresh Banana','Fresh Orange','Rotten Apple','Rotten Banana','Rotten Orange']
+
+@app.route("/")
 def index():
-    if request.method == 'POST':
-        if request.files:
-            image = request.files['image']
-            img_path = os.path.join(app.config['UPLOAD_FOLDER'], image.filename)
-            image.save(img_path)
-            prediction = predict_label(img_path)
-            return render_template('index.html', uploaded_image=image.filename, prediction=prediction)
+    return render_template("index.html")
 
-    return render_template('index.html')
+@app.route("/upload", methods=["POST"])
+def upload():
+    target = os.path.join(APP_ROOT, 'images/')
+    # target = os.path.join(APP_ROOT, 'static/')
+    print(target)
+    if not os.path.isdir(target):
+            os.mkdir(target)
+    else:
+        print("Couldn't create upload directory: {}".format(target))
+    print(request.files.getlist("file"))
+    for upload in request.files.getlist("file"):
+        print(upload)
+        print("{} is the file name".format(upload.filename))
+        filename = upload.filename
+        destination = "/".join([target, filename])
+        print ("Accept incoming file:", filename)
+        print ("Save it to:", destination)
+        upload.save(destination)
+        #import tensorflow as tf
+        import numpy as np
+        from keras.preprocessing import image
 
-@app.route('/display/<filename>')
-def send_uploaded_image(filename=''):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        from keras.models import load_model
+        new_model = load_model('model.h5')
+        new_model.summary()
+        test_image = image.load_img('images\\'+filename,target_size=(64,64))
+        test_image = image.img_to_array(test_image)
+        test_image = np.expand_dims(test_image, axis = 0)
+        result = new_model.predict(test_image)
+        result1 = result[0]
+        for i in range(6):
+    
+            if result1[i] == 1.:
+                break;
+        prediction = classes[i]
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    # return send_from_directory("images", filename, as_attachment=True)
+    return render_template("template.html",image_name=filename, text=prediction)
+
+@app.route('/upload/<filename>')
+def send_image(filename):
+    return send_from_directory("images", filename)
+
+if __name__ == "__main__":
+    app.run(debug=False)
+
