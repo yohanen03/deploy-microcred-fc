@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-classes = ['Fresh Apple','Fresh Banana','Fresh Orange','Rotten Apple','Rotten Banana','Rotten Orange']
+classes = ['Fresh Apple','Fresh Banana','Fresh Guava','Rotten Apple','Rotten Banana','Rotten Guava']
 
 @app.route("/")
 def index():
